@@ -22,7 +22,3 @@ Markdownエディター付きのシンプルなTODOアプリ
 pnpm install
 pnpm dev
 ```
-
-## スクリーンショット
-
-（準備中）
