@@ -9,6 +9,10 @@ lerna-debug.log*
 
 node_modules
 dist
+
+# Claude skills
+.claude/skills/**/node_modules
+.claude/skills/**/.temp-*
 dist-ssr
 *.local
 

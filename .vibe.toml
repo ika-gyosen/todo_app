@@ -1,0 +1,5 @@
+# ai-dev worktree configuration
+# See: https://github.com/kexi/vibe
+
+[hooks]
+post_start = ["pnpm install", "pnpm build"]
