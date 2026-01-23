@@ -4,11 +4,7 @@ import type { Todo } from '../types/todo'
 import { loadTodos, saveTodos } from '../utils/storage'
 
 export function useTodos() {
-  const [todos, setTodos] = useState<Todo[]>([])
-
-  useEffect(() => {
-    setTodos(loadTodos())
-  }, [])
+  const [todos, setTodos] = useState<Todo[]>(() => loadTodos())
 
   useEffect(() => {
     saveTodos(todos)
