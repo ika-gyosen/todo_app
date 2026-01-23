@@ -2,8 +2,9 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
-// ポート必須化: --portオプションを指定しないと起動しない
-const isDevCommand = process.argv.some(arg => arg.includes('vite') && !arg.includes('build') && !arg.includes('preview'))
+// ポート必須化: --portオプションを指定しないと起動しない（devコマンドのみ）
+const isBuildOrPreview = process.argv.includes('build') || process.argv.includes('preview')
+const isDevCommand = !isBuildOrPreview
 
 // --port引数からポート番号を取得
 function getPortFromArgs(): number | undefined {
