@@ -15,6 +15,7 @@ dist
 .claude/skills/**/.temp-*
 dist-ssr
 *.local
+settings.local.json
 
 # Editor directories and files
 .vscode/*
