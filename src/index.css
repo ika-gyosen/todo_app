@@ -1,7 +1,6 @@
 @import "tailwindcss";
-@plugin "@tailwindcss/typography";
-
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=BIZ+UDGothic:wght@400;700&display=swap');
+@plugin "@tailwindcss/typography";
 
 @theme {
   --font-sans: 'Inter', 'BIZ UDGothic', system-ui, sans-serif;
