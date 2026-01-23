@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useMemo, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import type { Todo } from '../types/todo'
 import { MarkdownEditor } from './MarkdownEditor'
@@ -20,29 +20,31 @@ export function EditPage({ getTodo, onAdd, onUpdate, onDelete, onToggleComplete 
 
   const [title, setTitle] = useState('')
   const [detail, setDetail] = useState('')
-  const [hasChanges, setHasChanges] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [showUnsavedConfirm, setShowUnsavedConfirm] = useState(false)
+  const [prevTodoId, setPrevTodoId] = useState<string | null>(null)
 
-  useEffect(() => {
+  // todoが変わった時にフォームをリセット（レンダリング中の状態調整パターン）
+  const currentTodoId = todo?.id ?? null
+  if (currentTodoId !== prevTodoId) {
+    setPrevTodoId(currentTodoId)
     if (todo) {
       setTitle(todo.title)
       setDetail(todo.detail)
-      setHasChanges(false)
     } else if (isNewMode) {
       setTitle('')
       setDetail('')
-      setHasChanges(false)
     }
-  }, [todo, isNewMode])
+  }
 
-  useEffect(() => {
+  // hasChangesは派生状態として計算
+  const hasChanges = useMemo(() => {
     if (isNewMode) {
-      setHasChanges(title.trim() !== '' || detail !== '')
+      return title.trim() !== '' || detail !== ''
     } else if (todo) {
-      const changed = title !== todo.title || detail !== todo.detail
-      setHasChanges(changed)
+      return title !== todo.title || detail !== todo.detail
     }
+    return false
   }, [title, detail, todo, isNewMode])
 
   const handleSave = useCallback(() => {
@@ -53,7 +55,6 @@ export function EditPage({ getTodo, onAdd, onUpdate, onDelete, onToggleComplete 
       navigate('/')
     } else if (id) {
       onUpdate(id, { title: title.trim(), detail })
-      setHasChanges(false)
     }
   }, [id, title, detail, isNewMode, onAdd, onUpdate, navigate])
 
