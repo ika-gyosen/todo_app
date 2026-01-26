@@ -1,26 +1,15 @@
-import { useNavigate } from 'react-router-dom'
-import type { Todo } from '../types/todo'
+import type { Todo } from '../../types/todo'
 
-interface TodoItemProps {
+interface TodoItemViewProps {
   todo: Todo
-  onToggleComplete: (id: string) => void
+  onClick: () => void
+  onCheckboxClick: (e: React.MouseEvent) => void
 }
 
-export function TodoItem({ todo, onToggleComplete }: TodoItemProps) {
-  const navigate = useNavigate()
-
-  const handleClick = () => {
-    navigate(`/edit/${todo.id}`)
-  }
-
-  const handleCheckboxClick = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    onToggleComplete(todo.id)
-  }
-
+export function TodoItemView({ todo, onClick, onCheckboxClick }: TodoItemViewProps) {
   return (
     <div
-      onClick={handleClick}
+      onClick={onClick}
       className={`
         group flex items-center gap-4 p-4
         bg-white/80 backdrop-blur-sm rounded-xl
@@ -35,7 +24,7 @@ export function TodoItem({ todo, onToggleComplete }: TodoItemProps) {
       <input
         type="checkbox"
         checked={todo.completed}
-        onClick={handleCheckboxClick}
+        onClick={onCheckboxClick}
         onChange={() => {}}
         className="shrink-0"
       />

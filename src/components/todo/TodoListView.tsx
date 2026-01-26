@@ -1,15 +1,19 @@
-import { useNavigate } from 'react-router-dom'
-import type { Todo } from '../types/todo'
-import { TodoItem } from './TodoItem'
+import type { ReactNode } from 'react'
+import type { Todo } from '../../types/todo'
 
-interface TodoListProps {
+interface TodoListViewProps {
   todos: Todo[]
-  onToggleComplete: (id: string) => void
+  incompleteCount: number
+  onAddClick: () => void
+  renderTodoItem: (todo: Todo, index: number) => ReactNode
 }
 
-export function TodoList({ todos, onToggleComplete }: TodoListProps) {
-  const navigate = useNavigate()
-
+export function TodoListView({
+  todos,
+  incompleteCount,
+  onAddClick,
+  renderTodoItem,
+}: TodoListViewProps) {
   return (
     <div className="max-w-2xl mx-auto px-6 py-12">
       {/* Header */}
@@ -20,11 +24,11 @@ export function TodoList({ todos, onToggleComplete }: TodoListProps) {
               TODO List
             </h1>
             <p className="text-ink-muted text-sm mt-1">
-              {todos.filter(t => !t.completed).length} 件の未完了タスク
+              {incompleteCount} 件の未完了タスク
             </p>
           </div>
           <button
-            onClick={() => navigate('/new')}
+            onClick={onAddClick}
             className="group flex items-center gap-2 px-5 py-2.5 bg-accent text-white rounded-lg hover:bg-accent-light transition-all duration-200 shadow-sm hover:shadow-md"
           >
             <svg className="w-4 h-4 transition-transform group-hover:rotate-90 duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -55,10 +59,7 @@ export function TodoList({ todos, onToggleComplete }: TodoListProps) {
               className="animate-in fade-in slide-in-from-bottom-2"
               style={{ animationDelay: `${index * 50}ms`, animationFillMode: 'both' }}
             >
-              <TodoItem
-                todo={todo}
-                onToggleComplete={onToggleComplete}
-              />
+              {renderTodoItem(todo, index)}
             </li>
           ))}
         </ul>

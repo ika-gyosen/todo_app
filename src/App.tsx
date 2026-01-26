@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { useTodos } from './hooks/useTodos'
-import { TodoList } from './components/TodoList'
-import { EditPage } from './components/EditPage'
+import { TodoListContainer } from './containers/TodoListContainer'
+import { EditPageContainer } from './containers/EditPageContainer'
 
 function App() {
   const { todos, addTodo, updateTodo, deleteTodo, toggleComplete, getTodo } = useTodos()
@@ -13,7 +13,7 @@ function App() {
           <Route
             path="/"
             element={
-              <TodoList
+              <TodoListContainer
                 todos={todos}
                 onToggleComplete={toggleComplete}
               />
@@ -22,7 +22,7 @@ function App() {
           <Route
             path="/new"
             element={
-              <EditPage
+              <EditPageContainer
                 getTodo={getTodo}
                 onAdd={addTodo}
                 onUpdate={updateTodo}
@@ -34,7 +34,7 @@ function App() {
           <Route
             path="/edit/:id"
             element={
-              <EditPage
+              <EditPageContainer
                 getTodo={getTodo}
                 onAdd={addTodo}
                 onUpdate={updateTodo}
