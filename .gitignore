@@ -27,3 +27,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Dev server
+.dev-server.pid
+.dev-server.log

@@ -1,0 +1,4 @@
+  [devServer.web]
+  start = "pnpm dev:start {{ports[0]}}"
+  stop = "pnpm dev:stop"
+  info = "URL: http://localhost:{{ports[0]}}"
