@@ -3,8 +3,3 @@
   stop = "pnpm dev:stop"
   info = "Web画面での起動確認"
   url = "http://localhost:{{ports[0]}}"
-  [devServer.web_2]
-  start = "pnpm dev:start {{ports[1]}}"
-  stop = "pnpm dev:stop"
-  info = "Web画面での起動確認 2"
-  url = "http://localhost:{{ports[1]}}"
