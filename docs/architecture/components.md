@@ -35,7 +35,7 @@ export function KanbanCardView({ todo, onClick }: KanbanCardViewProps) {
 - ドラッグ&ドロップなどの状態管理
 
 ```typescript
-// 良い例: ロジックをカプセル化（カンバンボード）
+// 良い例: ロジックをカプセル化
 export function KanbanBoardContainer({ todos, onUpdateStatus }: KanbanBoardContainerProps) {
   const navigate = useNavigate()
   const [activeId, setActiveId] = useState<string | null>(null)
