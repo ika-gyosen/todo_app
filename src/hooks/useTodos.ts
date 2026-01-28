@@ -15,7 +15,7 @@ export function useTodos() {
       id: uuidv4(),
       title,
       detail,
-      completed: false,
+      status: 'todo',
       createdAt: new Date().toISOString(),
     }
     setTodos(prev => [newTodo, ...prev])
@@ -34,7 +34,7 @@ export function useTodos() {
 
   const toggleComplete = useCallback((id: string) => {
     setTodos(prev => prev.map(todo =>
-      todo.id === id ? { ...todo, completed: !todo.completed } : todo
+      todo.id === id ? { ...todo, status: todo.status === 'done' ? 'todo' : 'done' } : todo
     ))
   }, [])
 

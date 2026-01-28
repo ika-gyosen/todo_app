@@ -18,12 +18,12 @@ export function TodoItemView({ todo, onClick, onCheckboxClick }: TodoItemViewPro
         transition-all duration-200
         hover:bg-white hover:shadow-lg hover:shadow-ink/5 hover:border-accent/20
         hover:-translate-y-0.5
-        ${todo.completed ? 'opacity-60' : ''}
+        ${todo.status === 'done' ? 'opacity-60' : ''}
       `}
     >
       <input
         type="checkbox"
-        checked={todo.completed}
+        checked={todo.status === 'done'}
         onClick={onCheckboxClick}
         onChange={() => {}}
         className="shrink-0"
@@ -33,7 +33,7 @@ export function TodoItemView({ todo, onClick, onCheckboxClick }: TodoItemViewPro
           className={`
             block text-base font-medium truncate
             transition-colors duration-200
-            ${todo.completed
+            ${todo.status === 'done'
               ? 'text-ink-muted line-through decoration-ink-muted/50'
               : 'text-ink group-hover:text-accent'
             }

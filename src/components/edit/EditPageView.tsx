@@ -69,11 +69,11 @@ export function EditPageView({
             <label className="flex items-center gap-2 px-4 py-2 bg-white border border-paper-dark rounded-xl cursor-pointer hover:border-accent/30 transition-all">
               <input
                 type="checkbox"
-                checked={todo.completed}
+                checked={todo.status === 'done'}
                 onChange={onToggleComplete}
               />
-              <span className={`text-sm font-medium ${todo.completed ? 'text-success' : 'text-ink-light'}`}>
-                {todo.completed ? '完了済み' : '未完了'}
+              <span className={`text-sm font-medium ${todo.status === 'done' ? 'text-success' : 'text-ink-light'}`}>
+                {todo.status === 'done' ? '完了済み' : '未完了'}
               </span>
             </label>
           )}

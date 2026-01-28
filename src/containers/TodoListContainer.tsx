@@ -13,7 +13,7 @@ export function TodoListContainer({ todos, onToggleComplete }: TodoListContainer
   const navigate = useNavigate()
 
   const incompleteCount = useMemo(() => {
-    return todos.filter(t => !t.completed).length
+    return todos.filter(t => t.status !== 'done').length
   }, [todos])
 
   const handleAddClick = useCallback(() => {
