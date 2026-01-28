@@ -1,3 +1,5 @@
 export { KanbanBoardView } from './KanbanBoardView'
 export { KanbanColumnView } from './KanbanColumnView'
 export { KanbanCardView } from './KanbanCardView'
+export { DraggableKanbanCard } from './DraggableKanbanCard'
+export { DroppableKanbanColumn } from './DroppableKanbanColumn'
