@@ -27,7 +27,6 @@ function App() {
                 onAdd={addTodo}
                 onUpdate={updateTodo}
                 onDelete={deleteTodo}
-                onUpdateStatus={updateTodoStatus}
               />
             }
           />
@@ -39,7 +38,6 @@ function App() {
                 onAdd={addTodo}
                 onUpdate={updateTodo}
                 onDelete={deleteTodo}
-                onUpdateStatus={updateTodoStatus}
               />
             }
           />

@@ -1,5 +1,5 @@
 import { useState, useMemo, useCallback } from 'react'
-import type { Todo } from '../types/todo'
+import type { Todo, TodoStatus } from '../types/todo'
 
 interface UseEditFormProps {
   todo?: Todo
@@ -18,6 +18,7 @@ export function useEditForm({
 }: UseEditFormProps) {
   const [title, setTitle] = useState('')
   const [detail, setDetail] = useState('')
+  const [status, setStatus] = useState<TodoStatus>('todo')
   const [prevTodoId, setPrevTodoId] = useState<string | null>(null)
 
   // todoが変わった時にフォームをリセット（レンダリング中の状態調整パターン）
@@ -27,9 +28,11 @@ export function useEditForm({
     if (todo) {
       setTitle(todo.title)
       setDetail(todo.detail)
+      setStatus(todo.status)
     } else if (isNewMode) {
       setTitle('')
       setDetail('')
+      setStatus('todo')
     }
   }
 
@@ -37,10 +40,10 @@ export function useEditForm({
     if (isNewMode) {
       return title.trim() !== '' || detail !== ''
     } else if (todo) {
-      return title !== todo.title || detail !== todo.detail
+      return title !== todo.title || detail !== todo.detail || status !== todo.status
     }
     return false
-  }, [title, detail, todo, isNewMode])
+  }, [title, detail, status, todo, isNewMode])
 
   const canSave = useMemo(() => {
     if (!title.trim()) return false
@@ -55,17 +58,19 @@ export function useEditForm({
       onAdd(title.trim(), detail)
       onNavigateBack()
     } else if (todo) {
-      onUpdate(todo.id, { title: title.trim(), detail })
+      onUpdate(todo.id, { title: title.trim(), detail, status })
     }
-  }, [todo, title, detail, isNewMode, onAdd, onUpdate, onNavigateBack])
+  }, [todo, title, detail, status, isNewMode, onAdd, onUpdate, onNavigateBack])
 
   return {
     title,
     detail,
+    status,
     hasChanges,
     canSave,
     setTitle,
     setDetail,
+    setStatus,
     handleSave,
   }
 }

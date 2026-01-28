@@ -1,4 +1,4 @@
-import type { Todo } from '../../types/todo'
+import type { Todo, TodoStatus } from '../../types/todo'
 import { MarkdownEditor } from './MarkdownEditor'
 import { ConfirmDialogContainer } from '../../containers/ConfirmDialogContainer'
 
@@ -7,6 +7,7 @@ interface EditPageViewProps {
   todo?: Todo
   title: string
   detail: string
+  status: TodoStatus
   hasChanges: boolean
   canSave: boolean
   showDeleteConfirm: boolean
@@ -16,7 +17,7 @@ interface EditPageViewProps {
   onSave: () => void
   onBack: () => void
   onDelete: () => void
-  onToggleComplete: () => void
+  onStatusChange: (status: TodoStatus) => void
   onConfirmDelete: () => void
   onCancelDelete: () => void
   onConfirmDiscard: () => void
@@ -28,6 +29,7 @@ export function EditPageView({
   todo,
   title,
   detail,
+  status,
   hasChanges,
   canSave,
   showDeleteConfirm,
@@ -37,7 +39,7 @@ export function EditPageView({
   onSave,
   onBack,
   onDelete,
-  onToggleComplete,
+  onStatusChange,
   onConfirmDelete,
   onCancelDelete,
   onConfirmDiscard,
@@ -64,18 +66,23 @@ export function EditPageView({
         </div>
 
         <div className="flex items-center gap-3">
-          {/* Complete toggle - 編集モードのみ */}
-          {!isNewMode && todo && (
-            <label className="flex items-center gap-2 px-4 py-2 bg-white border border-paper-dark rounded-xl cursor-pointer hover:border-accent/30 transition-all">
-              <input
-                type="checkbox"
-                checked={todo.status === 'done'}
-                onChange={onToggleComplete}
-              />
-              <span className={`text-sm font-medium ${todo.status === 'done' ? 'text-success' : 'text-ink-light'}`}>
-                {todo.status === 'done' ? '完了済み' : '未完了'}
-              </span>
-            </label>
+          {/* Status select - 編集モードのみ */}
+          {!isNewMode && (
+            <div className="flex items-center gap-2">
+              <label htmlFor="status-select" className="text-sm font-medium text-ink-light">
+                ステータス:
+              </label>
+              <select
+                id="status-select"
+                value={status}
+                onChange={e => onStatusChange(e.target.value as TodoStatus)}
+                className="px-3 py-2 bg-white border border-paper-dark rounded-xl text-sm font-medium text-ink focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent transition-all cursor-pointer"
+              >
+                <option value="todo">Todo</option>
+                <option value="inProgress">InProgress</option>
+                <option value="done">Done</option>
+              </select>
+            </div>
           )}
 
           {/* Delete button - 編集モードのみ */}
