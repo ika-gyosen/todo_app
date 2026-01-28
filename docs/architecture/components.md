@@ -11,17 +11,16 @@
 
 ```typescript
 // 良い例: 純粋なプレゼンテーション
-interface TodoItemViewProps {
+interface KanbanCardViewProps {
   todo: Todo
   onClick: () => void
-  onCheckboxClick: (e: React.MouseEvent) => void
 }
 
-export function TodoItemView({ todo, onClick, onCheckboxClick }: TodoItemViewProps) {
+export function KanbanCardView({ todo, onClick }: KanbanCardViewProps) {
   return (
     <div onClick={onClick}>
-      <input type="checkbox" onClick={onCheckboxClick} checked={todo.completed} />
       <span>{todo.title}</span>
+      <span>{todo.status}</span>
     </div>
   )
 }
@@ -33,27 +32,29 @@ export function TodoItemView({ todo, onClick, onCheckboxClick }: TodoItemViewPro
 - イベントハンドラの実装
 - ルーティング処理
 - Viewへのprops提供
+- ドラッグ&ドロップなどの状態管理
 
 ```typescript
-// 良い例: ロジックをカプセル化
-export function TodoItemContainer({ todo, onToggleComplete }: TodoItemContainerProps) {
+// 良い例: ロジックをカプセル化（カンバンボード）
+export function KanbanBoardContainer({ todos, onUpdateStatus }: KanbanBoardContainerProps) {
   const navigate = useNavigate()
+  const [activeId, setActiveId] = useState<string | null>(null)
 
-  const handleClick = useCallback(() => {
-    navigate(`/edit/${todo.id}`)
-  }, [navigate, todo.id])
+  const handleCardClick = useCallback((todoId: string) => {
+    navigate(`/edit/${todoId}`)
+  }, [navigate])
 
-  const handleCheckboxClick = useCallback((e: React.MouseEvent) => {
-    e.stopPropagation()
-    onToggleComplete(todo.id)
-  }, [onToggleComplete, todo.id])
+  const handleDragEnd = useCallback((event: DragEndEvent) => {
+    const { active, over } = event
+    if (!over) return
+    const newStatus = over.id as TodoStatus
+    onUpdateStatus(active.id as string, newStatus)
+  }, [onUpdateStatus])
 
   return (
-    <TodoItemView
-      todo={todo}
-      onClick={handleClick}
-      onCheckboxClick={handleCheckboxClick}
-    />
+    <DndContext onDragEnd={handleDragEnd}>
+      {/* カンバンカラムとカード */}
+    </DndContext>
   )
 }
 ```
@@ -65,34 +66,45 @@ export function TodoItemContainer({ todo, onToggleComplete }: TodoItemContainerP
 | コンポーネント | ファイル | 説明 |
 |--------------|---------|------|
 | ConfirmDialogView | `components/common/ConfirmDialogView.tsx` | 確認ダイアログのUI |
-| TodoItemView | `components/todo/TodoItemView.tsx` | TODOアイテムのUI |
-| TodoListView | `components/todo/TodoListView.tsx` | TODO一覧のUI |
+| KanbanCardView | `components/kanban/KanbanCardView.tsx` | カンバンカードのUI |
+| KanbanColumnView | `components/kanban/KanbanColumnView.tsx` | カンバンカラムのUI（参考用） |
+| KanbanBoardView | `components/kanban/KanbanBoardView.tsx` | カンバンボード全体のUI（参考用） |
+| DraggableKanbanCard | `components/kanban/DraggableKanbanCard.tsx` | ドラッグ可能なカンバンカード |
+| DroppableKanbanColumn | `components/kanban/DroppableKanbanColumn.tsx` | ドロップ可能なカンバンカラム |
 | EditPageView | `components/edit/EditPageView.tsx` | 編集画面のUI |
 | MarkdownEditor | `components/edit/MarkdownEditor.tsx` | Markdownエディタ |
+| TodoItemView | `components/todo/TodoItemView.tsx` | TODOアイテムのUI（レガシー） |
+| TodoListView | `components/todo/TodoListView.tsx` | TODO一覧のUI（レガシー） |
 
 ### コンテナコンポーネント
 
 | コンポーネント | ファイル | 説明 |
 |--------------|---------|------|
 | ConfirmDialogContainer | `containers/ConfirmDialogContainer.tsx` | ESCキー、バックドロップクリック処理 |
-| TodoItemContainer | `containers/TodoItemContainer.tsx` | アイテムクリック時のナビゲーション |
-| TodoListContainer | `containers/TodoListContainer.tsx` | 一覧表示、未完了カウント計算 |
+| KanbanBoardContainer | `containers/KanbanBoardContainer.tsx` | カンバンボード全体の管理、DnDコンテキスト |
 | EditPageContainer | `containers/EditPageContainer.tsx` | フォーム管理、CRUD操作 |
+| TodoItemContainer | `containers/TodoItemContainer.tsx` | アイテムクリック時のナビゲーション（レガシー） |
+| TodoListContainer | `containers/TodoListContainer.tsx` | 一覧表示、未完了カウント計算（レガシー） |
 
 ## 依存関係図
 
 ```
 App.tsx
-├── TodoListContainer
-│   ├── TodoListView
-│   └── TodoItemContainer
-│       └── TodoItemView
+├── KanbanBoardContainer (/)
+│   ├── DndContext (dnd-kit)
+│   ├── DroppableKanbanColumn
+│   │   └── DraggableKanbanCard
+│   │       └── KanbanCardView
+│   └── DragOverlay
+│       └── KanbanCardView
 │
-└── EditPageContainer
+└── EditPageContainer (/new, /edit/:id)
     ├── EditPageView
     │   └── MarkdownEditor
     └── ConfirmDialogContainer
         └── ConfirmDialogView
+
+（レガシー: TodoListContainer → TodoListView → TodoItemContainer → TodoItemView）
 ```
 
 ## Props設計のガイドライン

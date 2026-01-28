@@ -8,7 +8,8 @@
 src/
 ├── components/           # プレゼンテーションコンポーネント（純粋なUI）
 │   ├── common/          # 共通コンポーネント
-│   ├── todo/            # TODO一覧関連
+│   ├── kanban/          # カンバンボード関連
+│   ├── todo/            # TODO一覧関連（レガシー）
 │   └── edit/            # 編集画面関連
 │
 ├── containers/          # コンテナコンポーネント（ロジック管理）
@@ -50,11 +51,11 @@ src/
 
 | レイヤー | 責務 | 例 |
 |---------|------|-----|
-| Components | UI表示 | TodoItemView, TodoListView |
-| Containers | ロジック統合 | TodoItemContainer, TodoListContainer |
-| Hooks | 再利用可能ロジック | useDialog, useEditForm |
-| Types | 型定義 | Todo interface |
-| Utils | ユーティリティ | storage (LocalStorage操作) |
+| Components | UI表示 | KanbanCardView, DroppableKanbanColumn, EditPageView |
+| Containers | ロジック統合 | KanbanBoardContainer, EditPageContainer |
+| Hooks | 再利用可能ロジック | useTodos, useDialog, useEditForm |
+| Types | 型定義 | Todo interface, TodoStatus型 |
+| Utils | ユーティリティ | storage (LocalStorage操作、マイグレーション) |
 
 ## データフロー
 

@@ -3,26 +3,27 @@
 ## 全体像
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                         App.tsx                              │
-│  ┌───────────────────────────────────────────────────────┐  │
-│  │                    useTodos                            │  │
-│  │  todos, addTodo, updateTodo, deleteTodo, toggleComplete│  │
-│  └───────────────────────────────────────────────────────┘  │
-│                            │                                 │
-│         ┌──────────────────┼──────────────────┐             │
-│         ▼                  ▼                  ▼             │
-│  ┌────────────┐    ┌────────────┐    ┌────────────┐        │
-│  │ TodoList   │    │ EditPage   │    │ EditPage   │        │
-│  │ Container  │    │ Container  │    │ Container  │        │
-│  │  (/)       │    │  (/new)    │    │  (/edit/:id)│        │
-│  └────────────┘    └────────────┘    └────────────┘        │
-└─────────────────────────────────────────────────────────────┘
-                            │
-                            ▼
-                    ┌───────────────┐
-                    │ LocalStorage  │
-                    └───────────────┘
+┌──────────────────────────────────────────────────────────────────┐
+│                            App.tsx                                │
+│  ┌────────────────────────────────────────────────────────────┐  │
+│  │                       useTodos                              │  │
+│  │  todos, addTodo, updateTodo, deleteTodo, updateTodoStatus, │  │
+│  │  getTodo                                                    │  │
+│  └────────────────────────────────────────────────────────────┘  │
+│                             │                                     │
+│         ┌───────────────────┼───────────────────┐                │
+│         ▼                   ▼                   ▼                │
+│  ┌─────────────┐    ┌────────────┐    ┌────────────┐            │
+│  │ KanbanBoard │    │ EditPage   │    │ EditPage   │            │
+│  │ Container   │    │ Container  │    │ Container  │            │
+│  │  (/)        │    │  (/new)    │    │  (/edit/:id)│            │
+│  └─────────────┘    └────────────┘    └────────────┘            │
+└──────────────────────────────────────────────────────────────────┘
+                             │
+                             ▼
+                     ┌───────────────┐
+                     │ LocalStorage  │
+                     └───────────────┘
 ```
 
 ## 状態管理の流れ
@@ -64,29 +65,50 @@ LocalStorage → useTodos (loadTodos) → todos state → UI表示
           → LocalStorage保存
 ```
 
-### 5. 完了トグル
+### 5. ステータス変更（ドラッグ&ドロップ）
 
 ```
-チェックボックスクリック → TodoItemContainer.handleCheckboxClick
-                        → useTodos.toggleComplete
-                        → setTodos (state更新)
-                        → useEffect (saveTodos)
-                        → LocalStorage保存
+カードドラッグ → DndContext.onDragStart → activeId設定
+            → ドロップ先にドラッグ
+            → DndContext.onDragEnd
+            → KanbanBoardContainer.handleDragEnd
+            → useTodos.updateTodoStatus
+            → setTodos (state更新)
+            → useEffect (saveTodos)
+            → LocalStorage保存
+```
+
+### 6. ステータス変更（編集画面）
+
+```
+セレクトボックス変更 → EditPageView.onStatusChange
+                   → useEditForm.setStatus（ローカル状態）
+                   → 保存ボタンクリック
+                   → useEditForm.handleSave
+                   → useTodos.updateTodo({ status })
+                   → setTodos (state更新)
+                   → useEffect (saveTodos)
+                   → LocalStorage保存
 ```
 
 ## イベントハンドリングの流れ
 
-### TodoListからの遷移
+### カンバンボードからの遷移
 
 ```
-TodoListView
+KanbanBoardContainer
   │
-  ├─ 追加ボタン → TodoListContainer.handleAddClick
-  │             → navigate('/new')
+  ├─ 追加ボタン → handleAddClick → navigate('/new')
   │
-  └─ アイテムクリック → TodoItemView.onClick
-                     → TodoItemContainer.handleClick
-                     → navigate(`/edit/${todo.id}`)
+  ├─ カードクリック → DraggableKanbanCard.onClick
+  │               → handleCardClick → navigate(`/edit/${todo.id}`)
+  │
+  └─ カードドラッグ → DndContext.onDragStart
+                   → DraggableKanbanCard移動
+                   → DroppableKanbanColumnにドロップ
+                   → DndContext.onDragEnd
+                   → handleDragEnd
+                   → onUpdateStatus(todoId, newStatus)
 ```
 
 ### EditPageでの操作
@@ -100,9 +122,12 @@ EditPageView
   ├─ 詳細入力 → EditPageView.onDetailChange
   │          → EditPageContainer → useEditForm.setDetail
   │
+  ├─ ステータス変更 → EditPageView.onStatusChange（セレクトボックス）
+  │               → useEditForm.setStatus（ローカル状態）
+  │
   ├─ 保存ボタン → EditPageView.onSave
   │            → useEditForm.handleSave
-  │            → useTodos.addTodo または updateTodo
+  │            → useTodos.addTodo または updateTodo（statusを含む）
   │
   ├─ 戻るボタン（変更あり） → EditPageView.onBack
   │                       → EditPageContainer.handleBack
@@ -136,12 +161,18 @@ useEffect(() => {
       "id": "uuid-v4",
       "title": "タスク名",
       "detail": "詳細（Markdown）",
-      "completed": false,
+      "status": "todo",
       "createdAt": "2024-01-01T00:00:00.000Z"
     }
   ]
 }
 ```
+
+**TodoStatus型**: `'todo' | 'inProgress' | 'done'`
+
+**マイグレーション**: 旧形式（`completed: boolean`）のデータは`loadTodos`時に自動変換される。
+- `completed: true` → `status: 'done'`
+- `completed: false` → `status: 'todo'`
 
 ### 初期読み込み
 
@@ -153,12 +184,12 @@ const [todos, setTodos] = useState<Todo[]>(() => loadTodos())
 
 ## 派生状態の計算
 
-### 未完了カウント（TodoListContainer）
+### 未完了カウント（KanbanBoardContainer）
 
 ```typescript
-const incompleteCount = useMemo(() => {
-  return todos.filter(t => !t.completed).length
-}, [todos])
+const todoItems = useMemo(() => todos.filter(t => t.status === 'todo'), [todos])
+const inProgressItems = useMemo(() => todos.filter(t => t.status === 'inProgress'), [todos])
+const totalIncomplete = todoItems.length + inProgressItems.length
 ```
 
 ### フォーム変更検知（useEditForm）
@@ -167,9 +198,11 @@ const incompleteCount = useMemo(() => {
 const hasChanges = useMemo(() => {
   if (isNewMode) {
     return title.trim() !== '' || detail !== ''
+  } else if (todo) {
+    return title !== todo.title || detail !== todo.detail || status !== todo.status
   }
-  return title !== todo.title || detail !== todo.detail
-}, [title, detail, todo, isNewMode])
+  return false
+}, [title, detail, status, todo, isNewMode])
 
 const canSave = useMemo(() => {
   if (!title.trim()) return false

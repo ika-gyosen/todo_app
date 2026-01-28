@@ -21,15 +21,17 @@ function useTodos() {
   return {
     todos: Todo[]           // 全TODOリスト
     addTodo: (title: string, detail: string) => Todo
-    updateTodo: (id: string, updates: Partial<Todo>) => void
+    updateTodo: (id: string, updates: Partial<Omit<Todo, 'id' | 'createdAt'>>) => void
     deleteTodo: (id: string) => void
-    toggleComplete: (id: string) => void
+    updateTodoStatus: (id: string, status: TodoStatus) => void  // ステータス専用更新
     getTodo: (id: string) => Todo | undefined
   }
 }
 ```
 
 **使用場所**: `App.tsx`
+
+**注意**: `toggleComplete`は`updateTodoStatus`に置き換えられた。カンバンボードのドラッグ&ドロップで任意のステータス（'todo' | 'inProgress' | 'done'）を直接指定できるようにするため。
 
 ### useEditForm
 
@@ -40,7 +42,7 @@ interface UseEditFormProps {
   todo?: Todo
   isNewMode: boolean
   onAdd: (title: string, detail: string) => void
-  onUpdate: (id: string, updates: Partial<Todo>) => void
+  onUpdate: (id: string, updates: Partial<Omit<Todo, 'id' | 'createdAt'>>) => void
   onNavigateBack: () => void
 }
 
@@ -48,10 +50,12 @@ function useEditForm(props: UseEditFormProps) {
   return {
     title: string           // タイトル入力値
     detail: string          // 詳細入力値
+    status: TodoStatus      // ステータス（'todo' | 'inProgress' | 'done'）
     hasChanges: boolean     // 変更有無（派生状態）
     canSave: boolean        // 保存可能か（派生状態）
     setTitle: (title: string) => void
     setDetail: (detail: string) => void
+    setStatus: (status: TodoStatus) => void
     handleSave: () => void
   }
 }
@@ -60,9 +64,11 @@ function useEditForm(props: UseEditFormProps) {
 **使用場所**: `EditPageContainer`
 
 **特徴**:
-- todoが変わった時にフォームを自動リセット
+- todoが変わった時にフォームを自動リセット（title, detail, statusすべて）
 - `hasChanges`と`canSave`は派生状態として計算
+- `hasChanges`はstatusの変更も検知する
 - 新規作成モードと編集モードの両方に対応
+- 保存時にstatusも含めて`onUpdate`に渡す
 
 ### useDialog
 
@@ -149,9 +155,11 @@ function useDialogWithValidation() { ... }
 const hasChanges = useMemo(() => {
   if (isNewMode) {
     return title.trim() !== '' || detail !== ''
+  } else if (todo) {
+    return title !== todo.title || detail !== todo.detail || status !== todo.status
   }
-  return title !== todo.title || detail !== todo.detail
-}, [title, detail, todo, isNewMode])
+  return false
+}, [title, detail, status, todo, isNewMode])
 ```
 
 ### 3. 安定した参照のためuseCallbackを使用
