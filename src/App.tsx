@@ -1,6 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { useTodos } from './hooks/useTodos'
-import { TodoListContainer } from './containers/TodoListContainer'
+import { KanbanBoardContainer } from './containers/KanbanBoardContainer'
 import { EditPageContainer } from './containers/EditPageContainer'
 
 function App() {
@@ -13,7 +13,7 @@ function App() {
           <Route
             path="/"
             element={
-              <TodoListContainer
+              <KanbanBoardContainer
                 todos={todos}
                 onUpdateStatus={updateTodoStatus}
               />
