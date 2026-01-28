@@ -4,7 +4,7 @@ import { TodoListContainer } from './containers/TodoListContainer'
 import { EditPageContainer } from './containers/EditPageContainer'
 
 function App() {
-  const { todos, addTodo, updateTodo, deleteTodo, toggleComplete, getTodo } = useTodos()
+  const { todos, addTodo, updateTodo, deleteTodo, updateTodoStatus, getTodo } = useTodos()
 
   return (
     <BrowserRouter>
@@ -15,7 +15,7 @@ function App() {
             element={
               <TodoListContainer
                 todos={todos}
-                onToggleComplete={toggleComplete}
+                onUpdateStatus={updateTodoStatus}
               />
             }
           />
@@ -27,7 +27,7 @@ function App() {
                 onAdd={addTodo}
                 onUpdate={updateTodo}
                 onDelete={deleteTodo}
-                onToggleComplete={toggleComplete}
+                onUpdateStatus={updateTodoStatus}
               />
             }
           />
@@ -39,7 +39,7 @@ function App() {
                 onAdd={addTodo}
                 onUpdate={updateTodo}
                 onDelete={deleteTodo}
-                onToggleComplete={toggleComplete}
+                onUpdateStatus={updateTodoStatus}
               />
             }
           />

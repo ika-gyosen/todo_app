@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import type { Todo } from '../types/todo'
+import type { Todo, TodoStatus } from '../types/todo'
 import { EditPageView } from '../components/edit/EditPageView'
 import { useDialog } from '../hooks/useDialog'
 import { useEditForm } from '../hooks/useEditForm'
@@ -10,7 +10,7 @@ interface EditPageContainerProps {
   onAdd: (title: string, detail: string) => void
   onUpdate: (id: string, updates: Partial<Omit<Todo, 'id' | 'createdAt'>>) => void
   onDelete: (id: string) => void
-  onToggleComplete: (id: string) => void
+  onUpdateStatus: (id: string, status: TodoStatus) => void
 }
 
 export function EditPageContainer({
@@ -18,7 +18,7 @@ export function EditPageContainer({
   onAdd,
   onUpdate,
   onDelete,
-  onToggleComplete,
+  onUpdateStatus,
 }: EditPageContainerProps) {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
@@ -67,9 +67,10 @@ export function EditPageContainer({
   }, [id, onDelete, navigate])
 
   const handleToggleComplete = useCallback(() => {
-    if (!id) return
-    onToggleComplete(id)
-  }, [id, onToggleComplete])
+    if (!id || !todo) return
+    const newStatus: TodoStatus = todo.status === 'done' ? 'todo' : 'done'
+    onUpdateStatus(id, newStatus)
+  }, [id, todo, onUpdateStatus])
 
   const confirmDiscard = useCallback(() => {
     navigate('/')

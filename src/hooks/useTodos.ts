@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { v4 as uuidv4 } from 'uuid'
-import type { Todo } from '../types/todo'
+import type { Todo, TodoStatus } from '../types/todo'
 import { loadTodos, saveTodos } from '../utils/storage'
 
 export function useTodos() {
@@ -32,9 +32,9 @@ export function useTodos() {
     setTodos(prev => prev.filter(todo => todo.id !== id))
   }, [])
 
-  const toggleComplete = useCallback((id: string) => {
+  const updateTodoStatus = useCallback((id: string, status: TodoStatus) => {
     setTodos(prev => prev.map(todo =>
-      todo.id === id ? { ...todo, status: todo.status === 'done' ? 'todo' : 'done' } : todo
+      todo.id === id ? { ...todo, status } : todo
     ))
   }, [])
 
@@ -47,7 +47,7 @@ export function useTodos() {
     addTodo,
     updateTodo,
     deleteTodo,
-    toggleComplete,
+    updateTodoStatus,
     getTodo,
   }
 }

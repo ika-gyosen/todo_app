@@ -1,15 +1,15 @@
 import { useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import type { Todo } from '../types/todo'
+import type { Todo, TodoStatus } from '../types/todo'
 import { TodoListView } from '../components/todo/TodoListView'
 import { TodoItemContainer } from './TodoItemContainer'
 
 interface TodoListContainerProps {
   todos: Todo[]
-  onToggleComplete: (id: string) => void
+  onUpdateStatus: (id: string, status: TodoStatus) => void
 }
 
-export function TodoListContainer({ todos, onToggleComplete }: TodoListContainerProps) {
+export function TodoListContainer({ todos, onUpdateStatus }: TodoListContainerProps) {
   const navigate = useNavigate()
 
   const incompleteCount = useMemo(() => {
@@ -24,10 +24,10 @@ export function TodoListContainer({ todos, onToggleComplete }: TodoListContainer
     return (
       <TodoItemContainer
         todo={todo}
-        onToggleComplete={onToggleComplete}
+        onUpdateStatus={onUpdateStatus}
       />
     )
-  }, [onToggleComplete])
+  }, [onUpdateStatus])
 
   return (
     <TodoListView

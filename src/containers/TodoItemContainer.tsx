@@ -1,14 +1,14 @@
 import { useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import type { Todo } from '../types/todo'
+import type { Todo, TodoStatus } from '../types/todo'
 import { TodoItemView } from '../components/todo/TodoItemView'
 
 interface TodoItemContainerProps {
   todo: Todo
-  onToggleComplete: (id: string) => void
+  onUpdateStatus: (id: string, status: TodoStatus) => void
 }
 
-export function TodoItemContainer({ todo, onToggleComplete }: TodoItemContainerProps) {
+export function TodoItemContainer({ todo, onUpdateStatus }: TodoItemContainerProps) {
   const navigate = useNavigate()
 
   const handleClick = useCallback(() => {
@@ -17,8 +17,9 @@ export function TodoItemContainer({ todo, onToggleComplete }: TodoItemContainerP
 
   const handleCheckboxClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation()
-    onToggleComplete(todo.id)
-  }, [onToggleComplete, todo.id])
+    const newStatus: TodoStatus = todo.status === 'done' ? 'todo' : 'done'
+    onUpdateStatus(todo.id, newStatus)
+  }, [onUpdateStatus, todo.id, todo.status])
 
   return (
     <TodoItemView
